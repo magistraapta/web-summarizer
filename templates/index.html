@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Summarizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Text Summarizer</h1>
+
+            <div class="space-y-6">
+                <!-- Text Input -->
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="text">
+                        Enter your text:
+                    </label>
+                    <textarea
+                        id="text"
+                        rows="10"
+                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Paste your text here..."></textarea>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Max length (words):
+                        </label>
+                        <input
+                            type="number"
+                            id="max_length"
+                            value="130"
+                            min="30"
+                            max="500"
+                            class="w-32 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <button
+                        onclick="summarize()"
+                        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                        id="summarize-btn">
+                        Summarize
+                    </button>
+                </div>
+
+                <!-- Summary Output -->
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Summary:
+                    </label>
+                    <div id="summary" class="p-4 bg-gray-50 rounded-lg min-h-[100px] whitespace-pre-wrap">
+                        The summary will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function summarize() {
+            const text = document.getElementById('text').value;
+            const maxLength = parseInt(document.getElementById('max_length').value);
+            const summaryDiv = document.getElementById('summary');
+            const button = document.getElementById('summarize-btn');
+
+            if (!text) {
+                alert('Please enter some text to summarize');
+                return;
+            }
+
+            // Disable button and show loading state
+            button.disabled = true;
+            button.classList.add('opacity-50');
+            summaryDiv.innerHTML = 'Generating summary...';
+
+            try {
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        max_length: maxLength
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate summary');
+                }
+
+                const data = await response.json();
+                summaryDiv.innerHTML = data.summary;
+            } catch (error) {
+                summaryDiv.innerHTML = 'Error generating summary. Please try again.';
+                console.error('Error:', error);
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.classList.remove('opacity-50');
+            }
+        }
+    </script>
+</body>
+</html>
