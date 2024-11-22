@@ -12,3 +12,7 @@ embedded in the model without having to start from scratch.
 
 # Preview
 ![Screenshot 2024-11-22 at 18.28.29.png](images%2FScreenshot%202024-11-22%20at%2018.28.29.png)
+
+# References
+
+- https://huggingface.co/docs/transformers/tasks/summarization#load-billsum-dataset
